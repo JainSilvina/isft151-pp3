@@ -137,7 +137,7 @@ class FormularioComponent extends HTMLElement {
         if (isNaN(area) || area <= 0 || isNaN(espesor) || espesor <= 0 || material_id === "") {
             resultadoDisplay.textContent = JSON.stringify({
                 "Error": "Datos Incompletos/Inválidos", 
-                "Detalle": "Por favor, asegúrese de que el Área, Espesor sean números positivos y que haya seleccionado un Tipo de Ladrillo."
+                "Detalle": "Hay que asegurar, que el Área, Espesor sean números positivos y que haya seleccionado un Tipo de Ladrillo."
             }, null, 2);
             return;
         }
@@ -158,12 +158,12 @@ class FormularioComponent extends HTMLElement {
         } catch (error) {
             
             resultadoDisplay.textContent = JSON.stringify({
-                "Estado": "Cálculo Simulacro (Backend no disponible)",
+                "Estado": "Es una simulacion (Backend no esta disponible por ahora)",
                 "Material": material_id,
                 "Área_m2": area,
                 "Mortero": use_pre_mix ? pre_mix_id : "No aplica",
                 "Resultado_Ejemplo": "Se necesitan aproximadamente " + (area * 40).toFixed(0) + " unidades de " + material_id,
-                "Nota": "Este resultado es una simulación. Implemente /api/cotizar en el backend para cálculo real."
+                "Nota": "Es una simulación. Después hay que implementar/api/cotizar en el backend, si todo marcha bien."
             }, null, 2);
         }
     }
