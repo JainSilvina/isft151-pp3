@@ -1,3 +1,5 @@
+const { createElement } = require("react");
+
 class FormularioComponent extends HTMLElement {
     constructor() {
         super();
@@ -78,7 +80,7 @@ class FormularioComponent extends HTMLElement {
         this.cargarPreMixes();
     }
 
-   
+   /* cambiar esto y pasar a crear la base de datos
     async cargarMateriales() {
         
         const materialesData = [
@@ -86,32 +88,40 @@ class FormularioComponent extends HTMLElement {
             { id: 'ladrillo_comun', name: 'Ladrillo Común (Macizo) 12x25x5' },
             { id: 'bloque_hormigon', name: 'Bloque de Hormigón 20x40x20' },
         ];
-       
-        
+       */
+        //AGREGADO 20:49 HS  2/10/25
         const select = this.shadowRoot.getElementById("material");
-        
-        
-        const defaultOpt = document.createElement("option");
+
+        try {
+            
+            const res = await fetch("api/materials");
+            const data = await res.json();
+            data.forEach(m =>{
+                const opt = document.createElement("option");
+                opt.value= m.id;
+                opt.textContent= m.name;
+                Selection.appendChild(opt);
+
+            });
+        } catch (error) {
+            console.error("error al cargar materiales(API /api/materials no responde):", error);
+        }
+        }
+
+        //no necesito esta parte, no me sirve
+       /* const defaultOpt = document.createElement("option");
         defaultOpt.value = "";
         defaultOpt.textContent = "-- Seleccione un Material --";
-        select.appendChild(defaultOpt);
+        select.appendChild(defaultOpt);*/
 
-        materialesData.forEach(m => {
-            const opt = document.createElement("option");
-            opt.value = m.id;
-            opt.textContent = m.name;
-            select.appendChild(opt);
-        });
-  
-    }
-
-    async cargarPreMixes() {
+    // ya no lo necesito harcodeado
+    /*async cargarPreMixes() {
        
         const preMixesData = [
             { id: 'mortero_a', name: 'Mortero Premezclado Tipo A', uso: 'Mampostería Portante' },
             { id: 'mortero_b', name: 'Mortero Premezclado Tipo B', uso: 'Revoque Fino' },
             { id: 'mortero_c', name: 'Mortero Premezclado Tipo C', uso: 'Mampostería No Portante' },
-        ];
+        ]; */
         // ----------------------------------------------------------------------
 
         const select = this.shadowRoot.getElementById("pre_mix");
