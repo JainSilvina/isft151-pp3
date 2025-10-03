@@ -106,7 +106,7 @@ class FormularioComponent extends HTMLElement {
         } catch (error) {
             console.error("error al cargar materiales(API /api/materials no responde):", error);
         }
-        }
+        
 
         //no necesito esta parte, no me sirve
        /* const defaultOpt = document.createElement("option");
@@ -125,16 +125,24 @@ class FormularioComponent extends HTMLElement {
         // ----------------------------------------------------------------------
 
         const select = this.shadowRoot.getElementById("pre_mix");
-        
-        preMixesData.forEach(p => {
-            const opt = document.createElement("option");
-            opt.value = p.id;
-            opt.textContent = p.name + " (" + p.uso + ")";
-            select.appendChild(opt);
-        });
-       
-    }
 
+        try {
+            
+            const res = await fetch("/api/pre_mixes");
+            const data = await res.json();
+            data.forEach(m =>{
+                const opt = document.createElement("option");
+                opt.value= p.id;
+                opt.textContent= p.name + " (" + p.uso + ")";
+                Selection.appendChild(opt);
+
+            });
+        } catch (error) {
+            console.error("Error al cargar premezclas", error);
+        }
+        
+    
+// modificar mañana 4/10/25
     async calcular() {
         
         const area = parseFloat(this.shadowRoot.getElementById("area").value);
