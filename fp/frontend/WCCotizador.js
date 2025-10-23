@@ -1,6 +1,4 @@
-// frontend/CustomCotizador.js
-
-export class CustomCotizador extends HTMLElement {
+export class WCCotizador extends HTMLElement {
   constructor() {
     super();
     this.classList.add("w3-container", "w3-margin-top");
@@ -18,7 +16,7 @@ export class CustomCotizador extends HTMLElement {
     pMat.appendChild(this.materialSelect);
     this.form.appendChild(pMat);
 
-
+  
     let pEsp = document.createElement("p");
     let lblEsp = document.createElement("label");
     lblEsp.textContent = "Espesor de pared (cm):";
@@ -30,7 +28,7 @@ export class CustomCotizador extends HTMLElement {
     pEsp.appendChild(this.espesorInput);
     this.form.appendChild(pEsp);
 
-  
+
     let pArea = document.createElement("p");
     let lblArea = document.createElement("label");
     lblArea.textContent = "Área de pared (m²):";
@@ -42,7 +40,7 @@ export class CustomCotizador extends HTMLElement {
     pArea.appendChild(this.areaInput);
     this.form.appendChild(pArea);
 
-    // PreMix
+    
     let pPre = document.createElement("p");
     let lblPre = document.createElement("label");
     lblPre.textContent = "Usar mortero premezclado?";
@@ -56,7 +54,7 @@ export class CustomCotizador extends HTMLElement {
     pPre.appendChild(this.preMixSelect);
     this.form.appendChild(pPre);
 
-  
+
     let btnCalc = document.createElement("button");
     btnCalc.type = "button";
     btnCalc.textContent = "Calcular";
@@ -64,11 +62,10 @@ export class CustomCotizador extends HTMLElement {
     btnCalc.onclick = this.calcular.bind(this);
     this.form.appendChild(btnCalc);
 
-    // Resultado
     this.resultado = document.createElement("pre");
     this.resultado.classList.add("w3-code", "w3-margin-top");
 
-    // Título y montaje
+  
     let h2 = document.createElement("h2");
     h2.textContent = "Cotizador de Ladrillos y Mortero";
     this.appendChild(h2);
@@ -81,7 +78,7 @@ export class CustomCotizador extends HTMLElement {
     this.cargarPreMixes();
   }
 
-  // --- Métodos para cargar datos desde backend ---
+  // Métodos para cargar datos desde backend 
   async cargarMateriales() {
     try {
       const res = await fetch("http://127.0.0.1:5000/api/materials");
@@ -141,4 +138,4 @@ export class CustomCotizador extends HTMLElement {
   }
 }
 
-customElements.define("x-cotizador", CustomCotizador);
+customElements.define("wc-cotizador", WCCotizador);
