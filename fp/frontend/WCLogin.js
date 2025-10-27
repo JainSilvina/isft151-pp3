@@ -1,108 +1,90 @@
 import { WCCotizador } from "./WCCotizador.js";
-import { WCRegister } from "./WCRegister.js";
 import { WCUserForm } from "./WCUserForm.js";
-
-function navigateTo(path, metadata = {}) {
-  document.body.innerHTML = '';
-
-  if (path === 'app/cotizador') {
-    document.body.appendChild(new WCCotizador());
-  } else if (path === 'register') {
-    document.body.appendChild(new WCRegister());
-  } else if (path === 'app/admin') {
-    const adminView = new WCUserForm();
-    adminView.currentUser = metadata.currentUser || null;
-    document.body.appendChild(adminView);
-  } else {
-    document.body.appendChild(new WCLogin());
-  }
-}
+import { WCMateriales } from "./WCMateriales.js";
 
 export class WCLogin extends HTMLElement {
   constructor() {
     super();
-    this.classList.add('w3-container', 'w3-half', 'w3-margin-top');
+    this.classList.add("w3-container", "w3-margin-top");
 
-    this.form = document.createElement('form');
-    this.form.classList.add('w3-container', 'w3-card-4');
+    const card = document.createElement("div");
+    card.classList.add("w3-card", "w3-padding", "w3-light-grey");
 
-    const header = document.createElement('header');
-    header.classList.add('w3-container', 'w3-teal');
-    header.innerHTML = `<h1>Login</h1>`;
+    const title = document.createElement("h2");
+    title.textContent = "Inicio de Sesión";
+    card.appendChild(title);
 
-    const fields = [
-      { type: 'text', label: 'Name', required: true },
-      { type: 'password', label: 'Password', required: true },
-    ];
-    this.inputs = [];
+    const userLabel = document.createElement("label");
+    userLabel.textContent = "Usuario:";
+    this.usernameInput = document.createElement("input");
+    this.usernameInput.type = "text";
+    this.usernameInput.classList.add("w3-input", "w3-margin-bottom");
+    card.append(userLabel, this.usernameInput);
 
-    fields.forEach(f => {
-      const p = document.createElement('p');
-      const input = document.createElement('input');
-      input.type = f.type;
-      input.required = f.required;
-      input.classList.add('w3-input');
-      input.style.width = '90%';
-      const label = document.createElement('label');
-      label.textContent = f.label;
-      p.appendChild(input);
-      p.appendChild(label);
-      this.form.appendChild(p);
-      this.inputs.push(input);
-    });
+    const passLabel = document.createElement("label");
+    passLabel.textContent = "Contraseña:";
+    this.passwordInput = document.createElement("input");
+    this.passwordInput.type = "password";
+    this.passwordInput.classList.add("w3-input", "w3-margin-bottom");
+    card.append(passLabel, this.passwordInput);
 
-    const pLogin = document.createElement('p');
-    const btnLogin = document.createElement('button');
-    btnLogin.type = 'submit';
-    btnLogin.textContent = 'Log in';
-    btnLogin.classList.add('w3-button', 'w3-section', 'w3-teal', 'w3-ripple');
-    pLogin.appendChild(btnLogin);
-    this.form.appendChild(pLogin);
+    const loginBtn = document.createElement("button");
+    loginBtn.textContent = "Ingresar";
+    loginBtn.classList.add("w3-button", "w3-green", "w3-margin-top");
+    loginBtn.onclick = this.loginUser.bind(this);
+    card.appendChild(loginBtn);
 
-    const pRegister = document.createElement('p');
-    const btnRegister = document.createElement('button');
-    btnRegister.type = 'button';
-    btnRegister.textContent = 'Register';
-    btnRegister.classList.add('w3-button', 'w3-section', 'w3-blue', 'w3-ripple');
-    btnRegister.onclick = () => navigateTo('register');
-    pRegister.appendChild(btnRegister);
-    this.form.appendChild(pRegister);
-
-    this.appendChild(header);
-    this.appendChild(this.form);
+    this.appendChild(card);
   }
 
-  connectedCallback() {
-    this.form.onsubmit = this.onSubmit.bind(this);
-  }
+  async loginUser() {
+    const username = this.usernameInput.value.trim();
+    const password = this.passwordInput.value.trim();
 
-  async onSubmit(e) {
-    e.preventDefault();
-    const [name, password] = this.inputs.map(i => i.value.trim());
+    if (!username || !password) {
+      alert("Por favor complete todos los campos.");
+      return;
+    }
 
     try {
-      const res = await fetch('http://127.0.0.1:5000/api/login', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ name, password }),
+      const response = await fetch("http://127.0.0.1:5000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password })
       });
 
-      const result = await res.json();
+      const data = await response.json();
 
-      if (res.ok) {
-        alert(`${result.message}`);
-        if (result.role === 'administrador') {
-          navigateTo('app/admin', { currentUser: result });
-        } else {
-          navigateTo('app/cotizador');
-        }
-      } else {
-        alert(result.message);
+      if (!response.ok) {
+        alert(data.message || "Error al iniciar sesión");
+        return;
       }
-    } catch {
-      alert('Error de conexión con el servidor.');
+
+      sessionStorage.setItem("currentUser", JSON.stringify(data));
+      alert("Inicio de sesión exitoso.");
+
+      if (data.role === "administrador") {
+        const adminPanel = new WCUserForm();
+        document.body.innerHTML = "";
+        document.body.appendChild(adminPanel);
+      } else if (data.role === "cliente") {
+        const cot = new WCCotizador();
+        cot.currentUser = data;
+        document.body.innerHTML = "";
+        document.body.appendChild(cot);
+      } else if (data.role === "proveedor") {
+        const sup = new WCMateriales();
+        sup.currentUser = data;
+        document.body.innerHTML = "";
+        document.body.appendChild(sup);
+      }
+    } catch (err) {
+      console.error("Error en el login:", err);
+      alert("Error al conectar con el servidor.");
     }
   }
 }
 
-customElements.define('wc-login', WCLogin);
+customElements.define("wc-login", WCLogin);

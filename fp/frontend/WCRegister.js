@@ -69,7 +69,6 @@ export class WCRegister extends HTMLElement {
     this.appendChild(this.form);
   }
 
-  // 🔵 Nuevo método corregido
   async onRegister(e) {
     e?.preventDefault();
 

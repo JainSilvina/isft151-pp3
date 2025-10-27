@@ -1,98 +1,63 @@
-import sqlite3
-import os
+from app import app
+from models import db, User, Supplier, Material, PreMix, MaterialPrice, PreMixPrice
 
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-DB_PATH = os.path.join(BASE_DIR, "instance", "sqlite.db")
-os.makedirs(os.path.join(BASE_DIR, "instance"), exist_ok=True)
+with app.app_context():
+    db.drop_all()
+    db.create_all()
 
-conn = sqlite3.connect(DB_PATH)
-cur = conn.cursor()
+    admin = User(username="mati", password="admin", role="administrador")
+    cliente = User(username="cliente", password="cliente", role="cliente")
+    prov1 = User(username="imepho", password="1234", role="proveedor")
+    prov2 = User(username="easy", password="1234", role="proveedor")
 
-cur.execute("""
-CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT UNIQUE,
-    password TEXT,
-    role TEXT
-)
-""")
+    db.session.add_all([admin, cliente, prov1, prov2])
+    db.session.commit()
 
-cur.execute("INSERT OR IGNORE INTO users (username, password, role) VALUES (?, ?, ?)", ("admin", "1234", "administrador"))
+    supplier1 = Supplier(name="Imepho", user_id=prov1.id)
+    supplier2 = Supplier(name="Easy", user_id=prov2.id)
+    db.session.add_all([supplier1, supplier2])
+    db.session.commit()
 
-cur.execute("""
-CREATE TABLE IF NOT EXISTS materials (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    L_cm REAL,
-    H_cm REAL,
-    T_cm REAL,
-    units_m2 REAL,
-    mortar_m3 REAL,
-    cement_kg REAL,
-    sand_m3 REAL,
-    lime_kg REAL
-)
-""")
+    mat1 = Material(name="Ladrillo hueco 18x18x33", units_m2=16, mortar_m3=0.002, cement_kg=0.8, sand_m3=0.002, lime_kg=0.1)
+    mat2 = Material(name="Ladrillo común", units_m2=52, mortar_m3=0.002, cement_kg=0.7, sand_m3=0.002, lime_kg=0.1)
+    mat3 = Material(name="Ladrillo visto", units_m2=48, mortar_m3=0.002, cement_kg=0.7, sand_m3=0.002, lime_kg=0.1)
+    mat4 = Material(name="Bloque de hormigón", units_m2=12.5, mortar_m3=0.003, cement_kg=1.0, sand_m3=0.003, lime_kg=0.2)
+    db.session.add_all([mat1, mat2, mat3, mat4])
+    db.session.commit()
 
-cur.execute("""
-CREATE TABLE IF NOT EXISTS pre_mixes (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    uso TEXT,
-    rendimiento_text TEXT,
-    rendimiento_m2_per_bolsa REAL,
-    peso_bolsa_kg REAL,
-    precio_ref REAL
-)
-""")
+    premix1 = PreMix(name="Revoque grueso tradicional", uso="Base de pared", rendimiento_m2_per_bolsa=4)
+    premix2 = PreMix(name="Revoque fino", uso="Terminación", rendimiento_m2_per_bolsa=6)
+    premix3 = PreMix(name="Mortero de asiento", uso="Pegado de ladrillos", rendimiento_m2_per_bolsa=8)
+    db.session.add_all([premix1, premix2, premix3])
+    db.session.commit()
 
-cur.execute("""
-CREATE TABLE IF NOT EXISTS user_materials (
-    user_id INTEGER,
-    material_id INTEGER,
-    PRIMARY KEY (user_id, material_id),
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (material_id) REFERENCES materials(id)
-)
-""")
+    precios_materiales = [
+        MaterialPrice(material_id=mat1.id, supplier_id=supplier1.id, price=250, unit="unidad"),
+        MaterialPrice(material_id=mat1.id, supplier_id=supplier2.id, price=245, unit="unidad"),
 
-cur.execute("""
-CREATE TABLE IF NOT EXISTS user_pre_mixes (
-    user_id INTEGER,
-    pre_mix_id INTEGER,
-    PRIMARY KEY (user_id, pre_mix_id),
-    FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (pre_mix_id) REFERENCES pre_mixes(id)
-)
-""")
+        MaterialPrice(material_id=mat2.id, supplier_id=supplier1.id, price=150, unit="unidad"),
+        MaterialPrice(material_id=mat2.id, supplier_id=supplier2.id, price=155, unit="unidad"),
 
-materials = [
-    ("Ladrillo visto 24x12x6", 24, 12, 6, 30.8, 0.020, 13, 0.055, 4),
-    ("Ladrillo medio 9 cm", 24, 13, 9, 28.6, 0.018, 12, 0.050, 4),
-    ("Ladrillo 12 cm", 24, 12, 12, 25.6, 0.018, 12, 0.050, 4),
-    ("Ladrillo común 30x15x7", 30, 15, 7, 20.2, 0.018, 12, 0.050, 6),
-    ("Bloque hormigón 39x19x14", 39, 19, 14, 12.5, 0.030, 10, 0.070, 0),
-    ("Ladrillo hueco 33x18x14", 33, 18, 14, 15.5, 0.025, 11, 0.060, 0),
-]
-cur.executemany("""
-INSERT OR IGNORE INTO materials (name, L_cm, H_cm, T_cm, units_m2, mortar_m3, cement_kg, sand_m3, lime_kg)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-""", materials)
+        MaterialPrice(material_id=mat3.id, supplier_id=supplier1.id, price=280, unit="unidad"),
+        MaterialPrice(material_id=mat3.id, supplier_id=supplier2.id, price=275, unit="unidad"),
 
-pre_mixes = [
-    ("Procem Tradicional", "mampostería / revoque", "Rendimiento aprox. 1 m2 por bolsa 25-30kg según espesor", 1.0, 30, 1500.0),
-    ("Klaukol Maximo", "adhesivo / pega cerámica", "Rendimiento variable, 4-6 m2 por bolsa 20kg segun uso", 5.0, 20, 2200.0),
-]
-cur.executemany("""
-INSERT OR IGNORE INTO pre_mixes (name, uso, rendimiento_text, rendimiento_m2_per_bolsa, peso_bolsa_kg, precio_ref)
-VALUES (?, ?, ?, ?, ?, ?)
-""", pre_mixes)
+        MaterialPrice(material_id=mat4.id, supplier_id=supplier1.id, price=500, unit="unidad"),
+        MaterialPrice(material_id=mat4.id, supplier_id=supplier2.id, price=490, unit="unidad"),
+    ]
+    db.session.add_all(precios_materiales)
 
-for i in range(1, 7):
-    cur.execute("INSERT OR IGNORE INTO user_materials (user_id, material_id) VALUES (?, ?)", (1, i))
-for i in range(1, 3):
-    cur.execute("INSERT OR IGNORE INTO user_pre_mixes (user_id, pre_mix_id) VALUES (?, ?)", (1, i))
+    precios_premix = [
+        PreMixPrice(pre_mix_id=premix1.id, supplier_id=supplier1.id, price=3500, unit="bolsa"),
+        PreMixPrice(pre_mix_id=premix1.id, supplier_id=supplier2.id, price=3400, unit="bolsa"),
 
-conn.commit()
-conn.close()
-print("✅ init_db listo.")
+        PreMixPrice(pre_mix_id=premix2.id, supplier_id=supplier1.id, price=3700, unit="bolsa"),
+        PreMixPrice(pre_mix_id=premix2.id, supplier_id=supplier2.id, price=3600, unit="bolsa"),
+
+        PreMixPrice(pre_mix_id=premix3.id, supplier_id=supplier1.id, price=3900, unit="bolsa"),
+        PreMixPrice(pre_mix_id=premix3.id, supplier_id=supplier2.id, price=3850, unit="bolsa"),
+    ]
+    db.session.add_all(precios_premix)
+
+    db.session.commit()
+
+    print("✅ Base de datos inicializada con materiales, proveedores y precios.")
