@@ -9,7 +9,7 @@ source venv/bin/activate
 
 # 3.pip install flask flask-sqlalchemy flask-cors
 
-# 4. python init_bd.py
+# 4. python init_db.py
     (Deberías ver el mensaje: "✅ init_db listo: usuarios, materiales y pre_mixes cargados.")
 
 # 5. export FLASK_APP=app.py
