@@ -7,14 +7,14 @@ export class WCRegister extends HTMLElement {
 
     const header = document.createElement('header');
     header.classList.add('w3-container', 'w3-orange');
-    header.innerHTML = `<h1>Registro de Usuario</h1>`;
+    header.innerHTML = `<h1>Registro de Usuario (Cliente)</h1>`; 
 
     this.form = document.createElement('form');
     this.form.classList.add('w3-container', 'w3-card-4');
 
     const fields = [
-      { label: 'Name', type: 'text' },
-      { label: 'Password', type: 'password' },
+      { label: 'Usuario', type: 'text' }, 
+      { label: 'Contraseña', type: 'password' }, 
     ];
 
     this.inputs = {};
@@ -29,23 +29,8 @@ export class WCRegister extends HTMLElement {
       p.appendChild(input);
       p.appendChild(lbl);
       this.form.appendChild(p);
-      this.inputs[f.label.toLowerCase()] = input;
+      this.inputs[f.label.toLowerCase()] = input; 
     }
-
-    const pRole = document.createElement('p');
-    const lblRole = document.createElement('label');
-    lblRole.textContent = 'Rol';
-    this.selectRole = document.createElement('select');
-    this.selectRole.classList.add('w3-select');
-    ['cliente', 'administrador', 'proveedor'].forEach(r => {
-      const opt = document.createElement('option');
-      opt.value = r;
-      opt.textContent = r[0].toUpperCase() + r.slice(1);
-      this.selectRole.appendChild(opt);
-    });
-    pRole.appendChild(lblRole);
-    pRole.appendChild(this.selectRole);
-    this.form.appendChild(pRole);
 
     const pBtns = document.createElement('p');
     const btnReg = document.createElement('button');
@@ -72,11 +57,10 @@ export class WCRegister extends HTMLElement {
   async onRegister(e) {
     e?.preventDefault();
 
-    const name = this.inputs.name.value.trim();
-    const password = this.inputs.password.value.trim();
-    const role = this.selectRole.value;
-
-    if (!name || !password) {
+    const username = this.inputs.usuario.value.trim();
+    const password = this.inputs.contraseña.value.trim();
+    
+    if (!username || !password) {
       alert("Por favor, complete todos los campos.");
       return;
     }
@@ -85,7 +69,7 @@ export class WCRegister extends HTMLElement {
       const res = await fetch('http://127.0.0.1:5000/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, password, role }),
+        body: JSON.stringify({ username, password }), 
       });
 
       const text = await res.text();
@@ -98,7 +82,7 @@ export class WCRegister extends HTMLElement {
       }
 
       if (res.ok) {
-        alert('Usuario registrado correctamente');
+        alert('Usuario cliente registrado correctamente');
         document.body.innerHTML = '';
         document.body.appendChild(new WCLogin());
       } else {

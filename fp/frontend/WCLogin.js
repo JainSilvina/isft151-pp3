@@ -1,6 +1,7 @@
 import { WCCotizador } from "./WCCotizador.js";
 import { WCUserForm } from "./WCUserForm.js";
 import { WCMateriales } from "./WCMateriales.js";
+import { WCRegister } from "./WCRegister.js"; 
 
 export class WCLogin extends HTMLElement {
   constructor() {
@@ -33,6 +34,15 @@ export class WCLogin extends HTMLElement {
     loginBtn.classList.add("w3-button", "w3-green", "w3-margin-top");
     loginBtn.onclick = this.loginUser.bind(this);
     card.appendChild(loginBtn);
+    
+    const registerBtn = document.createElement("button");
+    registerBtn.textContent = "Registro";
+    registerBtn.classList.add("w3-button", "w3-blue", "w3-margin-top", "w3-margin-left");
+    registerBtn.onclick = () => {
+      document.body.innerHTML = "";
+      document.body.appendChild(new WCRegister()); 
+    };
+    card.appendChild(registerBtn);
 
     this.appendChild(card);
   }

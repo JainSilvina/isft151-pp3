@@ -2,6 +2,7 @@ from app import app
 from models import db, User, Supplier, Material, PreMix, MaterialPrice, PreMixPrice
 
 with app.app_context():
+
     db.drop_all()
     db.create_all()
 
@@ -18,46 +19,56 @@ with app.app_context():
     db.session.add_all([supplier1, supplier2])
     db.session.commit()
 
-    mat1 = Material(name="Ladrillo hueco 18x18x33", units_m2=16, mortar_m3=0.002, cement_kg=0.8, sand_m3=0.002, lime_kg=0.1)
-    mat2 = Material(name="Ladrillo común", units_m2=52, mortar_m3=0.002, cement_kg=0.7, sand_m3=0.002, lime_kg=0.1)
-    mat3 = Material(name="Ladrillo visto", units_m2=48, mortar_m3=0.002, cement_kg=0.7, sand_m3=0.002, lime_kg=0.1)
-    mat4 = Material(name="Bloque de hormigón", units_m2=12.5, mortar_m3=0.003, cement_kg=1.0, sand_m3=0.003, lime_kg=0.2)
-    db.session.add_all([mat1, mat2, mat3, mat4])
+    mat1 = Material(name="Ladrillo hueco 18x18x33", units_m2=16, mortar_m3=0.012, cement_kg=1.0, sand_m3=0.012, lime_kg=0.5, espesor_cm=18)
+
+    mat2 = Material(name="Ladrillo común", units_m2=52, mortar_m3=0.022, cement_kg=1.5, sand_m3=0.022, lime_kg=0.7, espesor_cm=15)
+
+    mat3 = Material(name="Ladrillo visto", units_m2=48, mortar_m3=0.018, cement_kg=1.3, sand_m3=0.018, lime_kg=0.6, espesor_cm=12)
+
+    mat4 = Material(name="Bloque hormigón 20x20x40", units_m2=12.5, mortar_m3=0.008, cement_kg=0.6, sand_m3=0.008, lime_kg=0.3, espesor_cm=20)
+
+    mat5_cemento = Material(name="Cemento x 50kg", units_m2=0, mortar_m3=0, cement_kg=0, sand_m3=0, lime_kg=0, espesor_cm=0) 
+    mat6_cal = Material(name="Cal", units_m2=0, mortar_m3=0, cement_kg=0, sand_m3=0, lime_kg=0, espesor_cm=0) 
+    mat7_arena = Material(name="Arena", units_m2=0, mortar_m3=0, cement_kg=0, sand_m3=0, lime_kg=0, espesor_cm=0) 
+    mat8_piedra = Material(name="Piedra/Grava", units_m2=0, mortar_m3=0, cement_kg=0, sand_m3=0, lime_kg=0, espesor_cm=0) 
+
+    db.session.add_all([mat1, mat2, mat3, mat4, mat5_cemento, mat6_cal, mat7_arena, mat8_piedra])
     db.session.commit()
 
-    premix1 = PreMix(name="Revoque grueso tradicional", uso="Base de pared", rendimiento_m2_per_bolsa=4)
-    premix2 = PreMix(name="Revoque fino", uso="Terminación", rendimiento_m2_per_bolsa=6)
-    premix3 = PreMix(name="Mortero de asiento", uso="Pegado de ladrillos", rendimiento_m2_per_bolsa=8)
-    db.session.add_all([premix1, premix2, premix3])
+    premix1 = PreMix(name="Mortero Listo (Fino)", uso="Fino/Revoque", rendimiento_m2_per_bolsa=1.5) 
+    premix2 = PreMix(name="Mortero Listo (Grueso)", uso="Grueso/Mampostería", rendimiento_m2_per_bolsa=1.0) 
+    db.session.add_all([premix1, premix2])
     db.session.commit()
+
 
     precios_materiales = [
-        MaterialPrice(material_id=mat1.id, supplier_id=supplier1.id, price=250, unit="unidad"),
-        MaterialPrice(material_id=mat1.id, supplier_id=supplier2.id, price=245, unit="unidad"),
+        MaterialPrice(material_id=mat5_cemento.id, supplier_id=supplier1.id, price=7500, unit="bolsa 50kg"),
+        MaterialPrice(material_id=mat5_cemento.id, supplier_id=supplier2.id, price=7450, unit="bolsa 50kg"),
+    
+        MaterialPrice(material_id=mat6_cal.id, supplier_id=supplier1.id, price=1500, unit="bolsa 25kg"),
+        MaterialPrice(material_id=mat6_cal.id, supplier_id=supplier2.id, price=1450, unit="bolsa 25kg"),
+        
+        MaterialPrice(material_id=mat7_arena.id, supplier_id=supplier1.id, price=10000, unit="m³"),
+        MaterialPrice(material_id=mat7_arena.id, supplier_id=supplier2.id, price=10500, unit="m³"),
 
-        MaterialPrice(material_id=mat2.id, supplier_id=supplier1.id, price=150, unit="unidad"),
-        MaterialPrice(material_id=mat2.id, supplier_id=supplier2.id, price=155, unit="unidad"),
+        MaterialPrice(material_id=mat8_piedra.id, supplier_id=supplier1.id, price=12000, unit="m³"),
+        MaterialPrice(material_id=mat8_piedra.id, supplier_id=supplier2.id, price=12500, unit="m³"),
 
-        MaterialPrice(material_id=mat3.id, supplier_id=supplier1.id, price=280, unit="unidad"),
-        MaterialPrice(material_id=mat3.id, supplier_id=supplier2.id, price=275, unit="unidad"),
-
-        MaterialPrice(material_id=mat4.id, supplier_id=supplier1.id, price=500, unit="unidad"),
-        MaterialPrice(material_id=mat4.id, supplier_id=supplier2.id, price=490, unit="unidad"),
+    
+        MaterialPrice(material_id=mat1.id, supplier_id=supplier1.id, price=150, unit="unidad"),
+        MaterialPrice(material_id=mat2.id, supplier_id=supplier1.id, price=50, unit="unidad"),
+        MaterialPrice(material_id=mat3.id, supplier_id=supplier2.id, price=80, unit="unidad"),
+        MaterialPrice(material_id=mat4.id, supplier_id=supplier2.id, price=200, unit="unidad"),
     ]
     db.session.add_all(precios_materiales)
 
+
     precios_premix = [
-        PreMixPrice(pre_mix_id=premix1.id, supplier_id=supplier1.id, price=3500, unit="bolsa"),
-        PreMixPrice(pre_mix_id=premix1.id, supplier_id=supplier2.id, price=3400, unit="bolsa"),
-
-        PreMixPrice(pre_mix_id=premix2.id, supplier_id=supplier1.id, price=3700, unit="bolsa"),
-        PreMixPrice(pre_mix_id=premix2.id, supplier_id=supplier2.id, price=3600, unit="bolsa"),
-
-        PreMixPrice(pre_mix_id=premix3.id, supplier_id=supplier1.id, price=3900, unit="bolsa"),
-        PreMixPrice(pre_mix_id=premix3.id, supplier_id=supplier2.id, price=3850, unit="bolsa"),
+        PreMixPrice(pre_mix_id=premix1.id, supplier_id=supplier1.id, price=2500, unit="bolsa 25kg"),
+        PreMixPrice(pre_mix_id=premix2.id, supplier_id=supplier2.id, price=2800, unit="bolsa 25kg"),
     ]
     db.session.add_all(precios_premix)
 
-    db.session.commit()
 
-    print("✅ Base de datos inicializada con materiales, proveedores y precios.")
+    db.session.commit()
+    print("Base de datos inicializada correctamente!")
