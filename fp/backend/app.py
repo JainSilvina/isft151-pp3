@@ -11,8 +11,6 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 @app.route("/api/items", methods=["POST"])
 def create_item():
-    """Ruta para crear un nuevo Material o PreMix (como lo solicita el proveedor).
-    Se usan valores por defecto para los campos técnicos."""
     data = request.get_json()
     item_type = data.get("type") 
     name = data.get("name")
@@ -56,7 +54,6 @@ def create_item():
 
 @app.route("/api/all_items", methods=["GET"])
 def get_all_items():
-    """Ruta para obtener todos los materiales y premezclas (para el formulario de alta de proveedor)."""
     materials = Material.query.all()
     premixes = PreMix.query.all()
 
@@ -80,7 +77,6 @@ def get_all_items():
 
 @app.route("/api/prices", methods=["POST"])
 def create_price():
-    """Ruta para Alta (Creación) de un nuevo precio por parte de un proveedor."""
     data = request.get_json()
     
     user_id = data.get("user_id") 
@@ -130,7 +126,6 @@ def create_price():
 
 @app.route("/api/supplier/prices/<int:user_id>", methods=["GET"])
 def get_supplier_prices(user_id):
-    """(NUEVA) Ruta para obtener todos los precios de un proveedor específico (para ABM)."""
     supplier = Supplier.query.filter_by(user_id=user_id).first()
     if not supplier:
         return jsonify({"message": "Proveedor no encontrado o no registrado."}), 404
@@ -154,7 +149,6 @@ def get_supplier_prices(user_id):
 
 @app.route("/api/prices/<int:price_id>", methods=["PUT"])
 def update_price_by_id(price_id):
-    """(NUEVA) Ruta para modificar un precio de material/premezcla (Proveedor)."""
     data = request.get_json()
     user_id = data.get("user_id")
     new_price = data.get("price")
@@ -194,8 +188,7 @@ def update_price_by_id(price_id):
 
 @app.route("/api/prices/<int:price_id>", methods=["DELETE"])
 def delete_price_by_id(price_id):
-    """(NUEVA) Ruta para eliminar un precio de material/premezcla (Proveedor)."""
-    
+  
     material_price = MaterialPrice.query.get(price_id)
     if material_price:
         db.session.delete(material_price)
@@ -212,7 +205,6 @@ def delete_price_by_id(price_id):
 
 @app.route("/api/materials")
 def get_materials():
-    """Obtiene la lista completa de materiales (ladrillos/bloques)."""
     materials = Material.query.all()
     return jsonify([m.to_dict() for m in materials]), 200
 
@@ -224,9 +216,6 @@ def get_pre_mixes():
 
 @app.route("/api/prices/needed", methods=["POST"])
 def get_needed_prices():
-    """
-    (ORIGINAL RESTAURADA) Ruta que busca precios para los materiales requeridos por el cotizador (CLIENTE).
-    """
     data = request.get_json()
     required_items = data.get("required_items", [])
  
@@ -309,7 +298,6 @@ def login():
 
 @app.route("/api/register", methods=["POST"])
 def register():
-    """Ruta para registrar nuevos usuarios con rol 'cliente' por defecto."""
     data = request.get_json()
     username = data.get("username")
     password = data.get("password")
@@ -320,7 +308,6 @@ def register():
     if User.query.filter_by(username=username).first():
         return jsonify({"message": "El usuario ya existe"}), 400
 
-    # RESTAURADO: Volvemos a guardar la contraseña en texto plano
     new_user = User(username=username, password=password, role="cliente")
     db.session.add(new_user)
     db.session.commit()
@@ -329,7 +316,6 @@ def register():
 
 @app.route("/api/cotizar", methods=["POST"])
 def cotizar_ladrillos():
-    """(ORIGINAL RESTAURADA) Ruta para cotizar materiales para muros (ladrillos/bloques)."""
     data = request.get_json()
 
     
@@ -415,7 +401,6 @@ def cotizar_ladrillos():
 
 @app.route("/api/cotizar/revoque", methods=["POST"])
 def cotizar_revoque():
-    """Ruta para cotizar materiales para revoque grueso a la cal."""
     data = request.get_json()
 
     try:
@@ -455,7 +440,6 @@ def cotizar_revoque():
 
 @app.route("/api/cotizar/hormigon", methods=["POST"])
 def cotizar_hormigon():
-    """Ruta para cotizar materiales para hormigón H-21 (Residencial)."""
     data = request.get_json()
 
     volumen_m3_input = float(data.get("volumen_m3", 0))
@@ -502,13 +486,11 @@ def cotizar_hormigon():
 
 @app.route("/api/users", methods=["GET"])
 def get_users():
-    """Ruta para obtener todos los usuarios (Admin)."""
     users = User.query.all()
     return jsonify([{"id": u.id, "username": u.username, "role": u.role} for u in users]), 200
 
 @app.route("/api/users", methods=["POST"])
 def create_user():
-    """Ruta para crear un nuevo usuario (Admin)."""
     data = request.get_json()
     username = data.get("username")
     password = data.get("password")
@@ -533,7 +515,6 @@ def create_user():
 
 @app.route("/api/users/<int:user_id>", methods=["PUT"])
 def update_user(user_id):
-    """Ruta para actualizar un usuario (Admin)."""
     user = User.query.get(user_id)
     if not user:
         return jsonify({"message": "Usuario no encontrado"}), 404
@@ -576,7 +557,6 @@ def update_user(user_id):
 
 @app.route("/api/users/<int:user_id>", methods=["DELETE"])
 def delete_user(user_id):
-    """Ruta para eliminar un usuario (Admin)."""
     user = User.query.get(user_id)
     if not user:
         return jsonify({"message": "Usuario no encontrado"}), 404
