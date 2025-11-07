@@ -1,0 +1,182 @@
+Crear ítem (Material o PreMix):
+
+Endpoint: "/api/items"
+Metodo HTTP: POST
+Formato de Serializacion: JSON
+Cabecera de Entrada: -
+Cabecera de Salida: -
+Estructura de datos IN:
+{
+    "type": "material",
+    "name": "Ladrillo hueco 18x18x33"
+}
+Estructura de datos OUT:
+{
+    "message": "Material creado correctamente",
+    "id": 10,
+    "name": "Ladrillo hueco 18x18x33",
+    "type": "material"
+} (HTTP 201)
+Estructura de datos ERR:
+{
+    "message": "Datos incompletos para crear el ítem (type, name)."
+} (HTTP 400)
+{
+    "message": "El Material 'nombre' ya existe."
+} (HTTP 409)
+{
+    "message": "Tipo de ítem inválido."
+} (HTTP 400)
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Obtener todos los ítems:
+Endpoint: "/api/all_items"
+Metodo HTTP: GET
+Formato de Serializacion: JSON
+Cabecera de Entrada: -
+Cabecera de Salida: -
+Estructura de datos IN: -
+Estructura de datos OUT:
+[
+    { "type": "material", "id": 1, "name": "Ladrillo común" },
+    { "type": "pre_mix", "id": 2, "name": "Revoque grueso" }
+] (HTTP 200)
+Estructura de datos ERR: -
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+Crear precio (Proveedor):
+Endpoint: "/api/prices"
+Metodo HTTP: POST
+Formato de Serializacion: JSON
+Estructura de datos IN:
+{
+    "user_id": 5,
+    "price": 1500.50,
+    "unit": "m3",
+    "material_id": 3
+}
+Estructura de datos OUT:
+{
+    "message": "Precio creado correctamente",
+    "price_id": 10
+} (HTTP 201)
+Estructura de datos ERR:
+{
+    "message": "Datos incompletos para crear el precio"
+} (HTTP 400)
+{
+    "message": "Ya existe un precio para este material."
+} (HTTP 409)
+{
+    "message": "Usuario no es un proveedor registrado."
+} (HTTP 403)
+
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+Obtener precios de un proveedor:
+Endpoint: "/api/supplier/prices/int:user_id
+"
+Metodo HTTP: GET
+Formato de Serializacion: JSON
+Estructura de datos OUT:
+[
+    {
+        "id": 1,
+        "type": "material",
+        "item_id": 3,
+        "item_name": "Ladrillo hueco",
+        "price": 1500.5,
+        "unit": "m3"
+    },
+    {
+        "id": 2,
+        "type": "pre_mix",
+        "item_id": 4,
+        "item_name": "Revoque grueso",
+        "price": 1800,
+        "unit": "bolsa"
+    }
+] (HTTP 200)
+Estructura de datos ERR:
+{
+    "message": "Proveedor no encontrado o no registrado."
+} (HTTP 404)
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+Actualizar precio (Proveedor):
+Endpoint: "/api/prices/int:price_id
+"
+Metodo HTTP: PUT
+Formato de Serializacion: JSON
+Estructura de datos IN:
+{
+    "user_id": 5,
+    "price": 1900.0,
+    "unit": "bolsa",
+    "type": "pre_mix"
+}
+Estructura de datos OUT:
+{
+    "message": "Precio actualizado correctamente"
+} (HTTP 200)
+Estructura de datos ERR:
+{
+    "message": "Datos incompletos para actualizar el precio"
+} (HTTP 400)
+{
+    "message": "No tiene permiso para editar este precio."
+} (HTTP 403)
+{
+    "message": "Precio no encontrado."
+} (HTTP 404)
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+Eliminar precio:
+
+Endpoint: "/api/prices/int:price_id
+"
+Metodo HTTP: DELETE
+Formato de Serializacion: JSON
+Estructura de datos OUT:
+{
+    "message": "Precio eliminado correctamente"
+} (HTTP 200)
+Estructura de datos ERR:
+{
+    "message": "Precio no encontrado"
+} (HTTP 404)
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+Obtener materiales:
+
+Endpoint: "/api/materials"
+Metodo HTTP: GET
+Formato de Serializacion: JSON
+Estructura de datos OUT:
+[
+    { "id": 1, "name": "Ladrillo común", "espesor_cm": 18.0 },
+    { "id": 2, "name": "Bloque de hormigón", "espesor_cm": 20.0 }
+] (HTTP 200)
+Estructura de datos ERR: -
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+Obtener premezclas:
+
+Endpoint: "/api/pre_mixes"
+Metodo HTTP: GET
+Formato de Serializacion: JSON
+Estructura de datos OUT:
+[
+    { "id": 1, "name": "Revoque grueso", "uso": "muro" },
+    { "id": 2, "name": "Pegamento cerámico", "uso": "colocación" }
+] (HTTP 200)
+Estructura de datos ERR: -
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+

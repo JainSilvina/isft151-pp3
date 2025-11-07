@@ -1,0 +1,105 @@
+Cotizar muro (Ladrillos/Bloques):
+
+Endpoint: "/api/cotizar"
+Metodo HTTP: POST
+Formato de Serializacion: JSON
+Estructura de datos IN:
+{
+    "area": 10.5,
+    "espesor": 18,
+    "junta": 10,
+    "material_id": 1,
+    "use_pre_mix": false
+}
+Estructura de datos OUT:
+{
+    "tipo": "Ladrillos/Bloques",
+    "material": { "id": 1, "name": "Ladrillo común" },
+    "area": 10.5,
+    "espesor_cm": 18,
+    "required_units": 800,
+    "total_mortar_m3": 0.65
+} (HTTP 200)
+Estructura de datos ERR:
+{
+    "message": "Datos de entrada inválidos"
+} (HTTP 400)
+{
+    "message": "Material no encontrado"
+} (HTTP 404)
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+Cotizar revoque:
+
+Endpoint: "/api/cotizar/revoque"
+Metodo HTTP: POST
+Formato de Serializacion: JSON
+Estructura de datos IN:
+{
+    "area": 25,
+    "espesor": 2
+}
+Estructura de datos OUT:
+{
+    "tipo": "Revoque",
+    "cement_kg": 160,
+    "lime_kg": 60,
+    "sand_m3": 0.375
+} (HTTP 200)
+Estructura de datos ERR:
+{
+    "message": "Datos de área o espesor inválidos"
+} (HTTP 400)
+
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+Cotizar hormigón:
+
+Endpoint: "/api/cotizar/hormigon"
+Metodo HTTP: POST
+Formato de Serializacion: JSON
+Estructura de datos IN:
+{
+    "volumen_m3": 2.5
+}
+Estructura de datos OUT:
+{
+    "tipo": "Hormigón",
+    "dosificacion": "H-21 (350:0.5:0.8)",
+    "cement_kg": 875,
+    "sand_m3": 1.25,
+    "gravel_m3": 2.0
+} (HTTP 200)
+Estructura de datos ERR:
+{
+    "message": "Debe ingresar el Volumen (m³) o Largo (m), Ancho (m) y Espesor (cm)."
+} (HTTP 400)
+
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+Obtener precios necesarios (Cliente):
+
+Endpoint: "/api/prices/needed"
+Metodo HTTP: POST
+Formato de Serializacion: JSON
+Estructura de datos IN:
+{
+    "required_items": [
+        { "type": "material", "id": 1 },
+        { "type": "premix", "id": 2 }
+    ]
+}
+Estructura de datos OUT:
+{
+    "prices_summary": [
+        {
+            "item_name": "Ladrillo común",
+            "prices": [
+                { "supplier": "Proveedor A", "price": 1500, "unit": "m3" }
+            ]
+        }
+    ]
+} (HTTP 200)
+Estructura de datos ERR: -

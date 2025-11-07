@@ -1,0 +1,143 @@
+Login de usuario:
+
+Endpoint: "/api/login"
+Metodo HTTP: POST
+Formato de Serializacion: JSON
+Cabecera de Entrada: -
+Cabecera de Salida: -
+Estructura de datos IN:
+{
+    "username":"nombre_usuario",
+    "password":"su_password",
+}
+Estructura de datos OUT:
+{
+    "id": 1,
+    "username":"nombre_usuario",
+    "role":"cliente"
+}
+Estructura de datos ERR:
+{
+    "type":"error",
+    "message":"Credenciales invalidas"
+} (HTTP 401)
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+Registro de usuario (cliente):
+
+Endpoint: "/api/register"
+Metodo HTTP: POST
+Formato de Serializacion: JSON
+Cabecera de Entrada: -
+Cabecera de Salida: -
+Estructura de datos IN:
+{
+    "username":"nuevo_usuario",
+    "password":"su_password"
+}
+Estructura de datos OUT:
+{
+    "message":"Usuario cliente registrado correctamente"
+}(HTTP 201)
+Estructura de datos ERR: 
+{
+    "type":"error",
+    "message":"Faltan usuario o contraseña"
+}(HTTP 400)
+{
+    "type":"error",
+    "message":"El usuario ya existe"
+}(HTTP 400)
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+Obtener todos los Usuarios:
+
+Endpoint: "/api/users"
+Metodo HTTP: GET
+Formato de Serializacion: JSON
+Cabecera de Entrada: -
+Cabecera de Salida: -
+Estructura de datos IN: -
+Estructura de datos OUT: 
+[
+    {
+        "id": 1,
+        "username":"usuario1",
+        "role":"cliente",
+    }
+    {
+        "id": 2,
+        "username":"prov1",
+        "role":"proveedor"
+    }
+]
+Estructura de datos ERR: (Error 500 si la base de datos falla)
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+Crear Usuario (Admin)
+
+Endpoint: "/api/users"
+Metodo HTTP: POST
+Formato de Serializacion: JSON
+Cabecera de Entrada: -
+Cabecera de Salida: -
+Estructura de datos IN:
+{
+    "username":"nuevo_usuario",
+    "password":"su_password",
+    "role":"proveedor"
+}
+Estructura de datos OUT:
+{
+    "message":"Usuario creado correctamente",
+    "id": 3
+} (HTTP 201)
+Estructura de datos ERR:
+{
+    "message":"Faltan usuario o contraseña"
+} (HTTP 400)
+{
+    "message":"El usuario ya existe"
+} (HTTP 400)
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+Actualiza Usuario:
+
+Endpoint: "api/users/<int:user_id>"
+Metodo HTTP: PUT
+Formato de Serializacion: JSON
+Cabecera de Entrada: -
+Cabecera de Salida: -
+Estructura de datos IN: 
+{
+    "username":"usuario_actualizado",
+    "password":"nueva_pass",
+    "role":"cliente"
+}
+Estructura de datos OUT:
+{
+    "message":"Usuario no encontrado"
+} (HTTP 404)
+Estructura de datos ERR:
+{
+    "message":"El nombre de usuario ya esta en uso"
+}(HTTP 400)
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+Eliminar Usuario:
+
+Endpoint: "/api/users/<int:user_id>"
+Metodo HTTP: DELETE
+Formato de Serializacion: JSON
+Cabecera de Entrada: -
+Cabecera de Salida: -
+Estructura de datos IN: -
+Estructura de datos OUT: 
+{
+    "message":"Usuario eliminado correctamente"
+}
+Estructura de datos ERR:
+{
+    "message":"Usuario no encontrado"
+} (HTTP 404)
+
