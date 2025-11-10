@@ -4,12 +4,23 @@ import os
 import atexit
 
 
-PROJECT_ROOT = os.path.abspath(os.path.dirname(sys.argv[0]))
+# --- INICIO DE MODIFICACIONES DE RUTA ---
+# 1. ORIGINAL: PROJECT_ROOT apuntaba a 'release' (donde está run.py)
+# PROJECT_ROOT = os.path.abspath(os.path.dirname(sys.argv[0]))
+
+# 1. CORREGIDO: Subimos un nivel (..) para que PROJECT_ROOT apunte a 'fp'
+# De esta manera, podemos acceder a las carpetas hermanas 'backend', 'frontend' y 'srs'.
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), '..'))
 
 BACKEND_DIR = os.path.join(PROJECT_ROOT, 'backend')
 FRONTEND_DIR = os.path.join(PROJECT_ROOT, 'frontend')
+
+# 2. CORREGIDO: Buscamos requirements.txt en la carpeta 'srs' (hermana de 'backend' y 'release')
+SRS_DIR = os.path.join(PROJECT_ROOT, 'srs')
+REQUIREMENTS_FILE = os.path.join(SRS_DIR, 'requirements.txt')
+# --- FIN DE MODIFICACIONES DE RUTA ---
+
 VENV_DIR = os.path.join(BACKEND_DIR, 'venv')
-REQUIREMENTS_FILE = os.path.join(BACKEND_DIR, 'requirements.txt')
 
 DB_FILE_PATH = os.path.join(BACKEND_DIR, 'instance', 'sqlite.db')
 INIT_DB_SCRIPT = 'init_db.py'
@@ -31,14 +42,16 @@ def run_command(command, cwd=None, check=True):
     """Función de ayuda para ejecutar comandos y mostrar errores."""
     print(f"\n[RUN]: {' '.join(command)}")
     try:
-        subprocess.run(command, cwd=cwd, check=check)
+        # Se añade captura de salida para diagnóstico de errores de instalación
+        result = subprocess.run(command, cwd=cwd, check=check, capture_output=True, text=True)
+        print(result.stdout)
     except subprocess.CalledProcessError as e:
         print(f"--- ERROR al ejecutar el comando: {e}")
         print("--- Salida del Error ---")
         if e.stdout:
-            print(e.stdout.decode())
+            print(e.stdout) # No necesita .decode() si text=True
         if e.stderr:
-            print(e.stderr.decode())
+            print(e.stderr) # No necesita .decode() si text=True
         print("-------------------------")
         sys.exit(1)
     except FileNotFoundError:
@@ -69,6 +82,7 @@ try:
         print("Entorno virtual encontrado.")
 
     print("Instalando/actualizando dependencias de 'requirements.txt'...")
+    # El archivo ahora se busca en la ruta corregida: fp/srs/requirements.txt
     run_command([VENV_PIP, 'install', '-r', REQUIREMENTS_FILE])
     print("Dependencias instaladas.")
     
